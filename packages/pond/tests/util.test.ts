@@ -7,14 +7,12 @@
  *  This source code is licensed under the BSD-style license found in the
  *  LICENSE file in the root directory of this source tree.
  */
-
 declare const describe: any;
 declare const it: any;
 declare const expect: any;
 declare const beforeEach: any;
 
-import * as Immutable from "immutable";
-import * as moment from "moment";
+import { generateTs } from "./utils";
 
 import Util from "../src/util";
 
@@ -60,5 +58,14 @@ describe("Util", () => {
         expect(+decodedPeriod.frequency()).toBe(300000);
         expect(+decodedPeriod.offset()).toBe(1234);
         expect(+decodedIndex).toBe(5002093);
+    });
+});
+
+describe("Test Utils", () => {
+    it("can generate 1 day of hourly unix time series", () => {
+        const data = generateTs(0, 24 * 3600 * 1000, 3600 * 1000);
+        expect(data.length).toBe(24);
+        expect(data[0]).toEqual([0, 0]);
+        expect(data[data.length - 1]).toEqual([(86400 - 3600) * 1000, 23]);
     });
 });
