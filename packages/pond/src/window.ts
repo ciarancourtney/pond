@@ -109,6 +109,71 @@ export class DayWindow extends WindowBase {
 }
 
 /**
+ * Specifies a repeating week duration specific to the supplied timezone. You can
+ * create one using the `weekly()` factory function.
+ *
+ * Example:
+ * ```
+ * const weekWindowNewYork = weekly("America/New_York");
+ * const indexes = weekWindowNewYork.getIndexSet(Util.untilNow(duration("21d")));
+ * ```
+ */
+// tslint:disable-next-line:max-classes-per-file
+export class WeekWindow extends WindowBase {
+    /**
+     * Given an index string representing a week (e.g. "2015-W08"), and optionally
+     * the timezone (default is UTC), return the corresponding `TimeRange`.
+     */
+    public static timeRangeOf(indexString: string, tz: string = "Etc/UTC"): TimeRange {
+        const beginTime = moment(indexString, moment.HTML5_FMT.WEEK).tz(tz);
+        const endTime = beginTime.clone().endOf("isoWeek");
+
+        return new TimeRange(beginTime, endTime);
+    }
+
+    private _tz: string;
+
+    /**
+     * Construct a new `WeekWindow`, optionally supplying the timezone `tz`
+     * for the `Window`. The default is `UTC`.
+     * TODO add option to use non-ISO week
+     */
+    constructor(tz: string = "Etc/UTC") {
+        super();
+        this._tz = tz;
+    }
+
+    /**
+     * Returns an `Immutable.OrderedSet<Index>` set of day `Index`es for the
+     * `Time` or `TimeRange` supplied as `t`.
+     *
+     * The simplest invocation of this function would be to pass in a `Time`
+     * and get the week (e.g. "2017-W12"). What week you get may depend on the
+     * timezone specified when constructing this `WeekWindow`. The most useful
+     * aspect of a `WeekWindow` is that you can use this index set to bucket
+     * `Event`s into weeks in a particular timezone.
+     */
+    public getIndexSet(t: Time | TimeRange): Immutable.OrderedSet<Index> {
+        let results = Immutable.OrderedSet<Index>();
+        let t1: moment;
+        let t2: moment;
+        if (t instanceof Time) {
+            t1 = moment(+t).tz(this._tz);
+            t2 = moment(+t).tz(this._tz);
+        } else if (t instanceof TimeRange) {
+            t1 = moment(+t.begin()).tz(this._tz);
+            t2 = moment(+t.end()).tz(this._tz);
+        }
+        let tt = t1;
+        while (tt.isSameOrBefore(t2)) {
+            results = results.add(index(t1.format("YYYY-[W]WW"), this._tz));
+            tt = tt.add(1, "w");
+        }
+        return results;
+    }
+}
+
+/**
  * A `Window` is a specification for repeating range of time range which is
  * typically used in Pond to describe an aggregation bounds.
  *
@@ -274,4 +339,8 @@ function daily(tz: string = "Etc/UTC"): DayWindow {
     return new DayWindow(tz);
 }
 
-export { window, daily /*, monthly, yearly*/ };
+function weekly(tz: string = "Etc/UTC"): WeekWindow {
+    return new WeekWindow(tz);
+}
+
+export { window, daily, weekly /*, monthly, yearly*/ };

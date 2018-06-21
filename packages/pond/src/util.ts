@@ -153,6 +153,10 @@ function timeRangeFromIndexString(indexString: string, tz: string = "Etc/UTC"): 
                 const parsedMonth = parseInt(parts[1], 10);
                 beginTime = moment.tz([parsedYear, parsedMonth - 1], tz);
                 endTime = moment.tz([parsedYear, parsedMonth - 1], tz).endOf("month");
+            } else if (!_.isNaN(parseInt(parts[0], 10)) && parts[1].startsWith("W")) {
+                // An ISO week e.g 2015-W09
+                beginTime = moment.tz(indexString, tz);
+                endTime = beginTime.clone().endOf("isoWeek");
             }
             break;
 

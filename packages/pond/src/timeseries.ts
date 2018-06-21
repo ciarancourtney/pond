@@ -22,7 +22,7 @@ import { Select } from "./select";
 import { SortedCollection } from "./sortedcollection";
 import { time, Time } from "./time";
 import { TimeRange, timerange } from "./timerange";
-import { daily, window } from "./window";
+import { daily, weekly, window } from "./window";
 
 import {
     avg,
@@ -1231,6 +1231,27 @@ export class TimeSeries<T extends Key> {
             );
         }
         return this._rollup({ window: daily(timezone), aggregation });
+    }
+
+    /**
+     * Builds a new `TimeSeries` by dividing events into ISO weeks.
+     *
+     * Each window then has an aggregation specification `aggregation`
+     * applied. This specification describes a mapping of output
+     * fieldNames to aggregation functions and their fieldPath. For example:
+     * ```
+     * {in_avg: ["in", avg()], out_avg: ["out", avg()]}
+     * ```
+     *
+     */
+    weeklyRollup(options: RollupOptions<T>): TimeSeries<Index> {
+        const { aggregation, timezone = "Etc/UTC" } = options;
+        if (!aggregation || !_.isObject(aggregation)) {
+            throw new Error(
+                "aggregation object must be supplied, for example: {avg_value: {value: avg()}}"
+            );
+        }
+        return this._rollup({ window: weekly(timezone), aggregation });
     }
 
     /**

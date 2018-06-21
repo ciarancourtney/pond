@@ -27,7 +27,8 @@ import { time, Time } from "../src/time";
 import { timerange, TimeRange } from "../src/timerange";
 import { TimeSeries, TimeSeriesWireFormat } from "../src/timeseries";
 import { indexedSeries, timeRangeSeries, timeSeries } from "../src/timeseries";
-import { window } from "../src/window";
+import { daily, weekly, window } from "../src/window";
+import { generateTs } from "./utils";
 
 const EVENT_DATA = {
     name: "avg temps",
@@ -335,6 +336,14 @@ const sept2014Data = {
         [1409940000000, 93],
         [1409943600000, 35]
     ]
+};
+
+// 2000-01-02 > 2002-01-01
+const twoYearsHourly = {
+    utc: false,
+    name: "traffic",
+    columns: ["time", "value"],
+    points: generateTs(946684800 * 1000, 1009843200 * 1000, 3600 * 1000)
 };
 
 const OUTAGE_EVENT_LIST = Immutable.List([
@@ -1092,6 +1101,26 @@ describe("Rollups", () => {
 
         expect(collections["1d-16314"].size()).toBe(24);
         expect(collections["1d-16318"].size()).toBe(20);
+    });
+
+    it("can generate weekly aggregate sums of two years of raw TimeSeries", () => {
+        const timeseries = timeSeries(twoYearsHourly);
+
+        const collections = timeseries.weeklyRollup({
+            window: weekly(),
+            aggregation: { value: ["value", sum()] }
+        });
+
+        expect(collections.size()).toBe(104);
+
+        expect(collections.begin().toUTCString()).toBe("Mon, 03 Jan 2000 00:00:00 GMT");
+        expect(collections.end().toUTCString()).toBe("Sun, 30 Dec 2001 23:59:59 GMT");
+
+        expect(collections.atFirst().indexAsString()).toBe("2000-W01");
+        expect(collections.atLast().indexAsString()).toBe("2001-W52");
+
+        expect(collections.atFirst().get("value")).toBe(22092);
+        expect(collections.atLast().get("value")).toBe(2929164);
     });
 
     it("can correctly use atTime()", () => {
