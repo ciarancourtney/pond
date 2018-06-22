@@ -7,7 +7,7 @@
  */
 export function generateTs(startTsIncl: number, endTsExcl: number, interval: number): number[][] {
     const data = [];
-    let value = 0;
+    let value = 1;
     while (startTsIncl < endTsExcl) {
         data.push([startTsIncl, value]);
         startTsIncl += interval;

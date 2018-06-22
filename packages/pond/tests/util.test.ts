@@ -65,7 +65,7 @@ describe("Test Utils", () => {
     it("can generate 1 day of hourly unix time series", () => {
         const data = generateTs(0, 24 * 3600 * 1000, 3600 * 1000);
         expect(data.length).toBe(24);
-        expect(data[0]).toEqual([0, 0]);
-        expect(data[data.length - 1]).toEqual([(86400 - 3600) * 1000, 23]);
+        expect(data[0]).toEqual([0, 1]);
+        expect(data[data.length - 1]).toEqual([(86400 - 3600) * 1000, 24]);
     });
 });
