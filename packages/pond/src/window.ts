@@ -166,7 +166,7 @@ export class WeekWindow extends WindowBase {
         }
         let tt = t1;
         while (tt.isSameOrBefore(t2)) {
-            results = results.add(index(t1.format("YYYY-[W]WW"), this._tz));
+            results = results.add(index(t1.format(moment.HTML5_FMT.WEEK), this._tz));
             tt = tt.add(1, "w");
         }
         return results;
