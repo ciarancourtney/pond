@@ -22,7 +22,7 @@ import { Select } from "./select";
 import { SortedCollection } from "./sortedcollection";
 import { time, Time } from "./time";
 import { TimeRange, timerange } from "./timerange";
-import { daily, weekly, window } from "./window";
+import { daily, monthly, weekly, window } from "./window";
 
 import {
     avg,
@@ -1265,9 +1265,9 @@ export class TimeSeries<T extends Key> {
      * ```
      *
      */
-    /*
+
     monthlyRollup(options: RollupOptions<T>): TimeSeries<Index> {
-        const { aggregation } = options;
+        const { aggregation, timezone = "Etc/UTC" } = options;
 
         if (!aggregation || !_.isObject(aggregation)) {
             throw new Error(
@@ -1275,9 +1275,9 @@ export class TimeSeries<T extends Key> {
             );
         }
 
-        return this._rollup({ windowSize: period("monthly"), aggregation });
+        return this._rollup({ window: monthly(timezone), aggregation });
     }
-    */
+
 
     /**
      * Builds a new `TimeSeries` by dividing events into years.

@@ -27,7 +27,7 @@ import { time, Time } from "../src/time";
 import { timerange, TimeRange } from "../src/timerange";
 import { TimeSeries, TimeSeriesWireFormat } from "../src/timeseries";
 import { indexedSeries, timeRangeSeries, timeSeries } from "../src/timeseries";
-import { daily, weekly, window } from "../src/window";
+import { daily, monthly, weekly, window } from "../src/window";
 import { generateTs } from "./utils";
 
 const EVENT_DATA = {
@@ -1123,6 +1123,26 @@ describe("Rollups", () => {
         expect(collections.atFirst().get("value")).toBe(22260);
         expect(collections.atLast().get("value")).toBe(2929332);
     });
+
+    it("can generate monthly aggregate sums of two years of raw TimeSeries", () => {
+        const timeseries = timeSeries(twoYearsHourly);
+
+        const collections = timeseries.monthlyRollup({
+            window: monthly(),
+            aggregation: { value: ["value", sum()] }
+        });
+
+        expect(collections.size()).toBe(24);
+
+        expect(collections.begin().toUTCString()).toBe("Sat, 01 Jan 2000 00:00:00 GMT");
+        expect(collections.end().toUTCString()).toBe("Mon, 31 Dec 2001 23:59:59 GMT");
+
+        expect(collections.atFirst().indexAsString()).toBe("2000-01");
+        expect(collections.atLast().indexAsString()).toBe("2001-12");
+
+        const monthIntervals = 31 * 24;
+        expect(collections.atFirst().get("value")).toBe((monthIntervals * (monthIntervals + 1)) / 2);
+        expect(collections.atLast().get("value")).toBe(12776340);
     });
 
     it("can correctly use atTime()", () => {

@@ -174,6 +174,67 @@ export class WeekWindow extends WindowBase {
 }
 
 /**
+ * Specifies a repeating month duration specific to the supplied timezone. You can
+ * create one using the `monthly()` factory function.
+ *
+ * Example:
+ * ```
+ * const monthWindowNewYork = monthly("America/New_York");
+ * const indexes = monthWindowNewYork.getIndexSet(Util.untilNow(duration("21d")));
+ * ```
+ */
+// tslint:disable-next-line:max-classes-per-file
+export class MonthWindow extends WindowBase {
+    /**
+     * Given an index string representing a month (e.g. "2015-08"), and optionally
+     * the timezone (default is UTC), return the corresponding `TimeRange`.
+     */
+    public static timeRangeOf(indexString: string, tz: string = "Etc/UTC"): TimeRange {
+        const beginTime = moment(indexString, moment.HTML5_FMT.MONTH).tz(tz);
+        const endTime = beginTime.clone().endOf("month");
+
+        return new TimeRange(beginTime, endTime);
+    }
+
+    private _tz: string;
+
+    /**
+     * Construct a new `MonthWindow`, optionally supplying the timezone `tz`
+     * for the `Window`. The default is `UTC`.
+     */
+    constructor(tz: string = "Etc/UTC") {
+        super();
+        this._tz = tz;
+    }
+
+    /**
+     * Returns an `Immutable.OrderedSet<Index>` set of day `Index`es for the
+     * `Time` or `TimeRange` supplied as `t`.
+     *
+     * The simplest invocation of this function would be to pass in a `Time`
+     * and get the month (e.g. "2017-12").
+     */
+    public getIndexSet(t: Time | TimeRange): Immutable.OrderedSet<Index> {
+        let results = Immutable.OrderedSet<Index>();
+        let t1: moment;
+        let t2: moment;
+        if (t instanceof Time) {
+            t1 = moment(+t).tz(this._tz);
+            t2 = moment(+t).tz(this._tz);
+        } else if (t instanceof TimeRange) {
+            t1 = moment(+t.begin()).tz(this._tz);
+            t2 = moment(+t.end()).tz(this._tz);
+        }
+        let tt = t1;
+        while (tt.isSameOrBefore(t2)) {
+            results = results.add(index(t1.format(moment.HTML5_FMT.MONTH), this._tz));
+            tt = tt.add(1, "m");
+        }
+        return results;
+    }
+}
+
+/**
  * A `Window` is a specification for repeating range of time range which is
  * typically used in Pond to describe an aggregation bounds.
  *
@@ -343,4 +404,8 @@ function weekly(tz: string = "Etc/UTC"): WeekWindow {
     return new WeekWindow(tz);
 }
 
-export { window, daily, weekly /*, monthly, yearly*/ };
+function monthly(tz: string = "Etc/UTC"): MonthWindow {
+    return new MonthWindow(tz);
+}
+
+export { window, daily, weekly, monthly, /* yearly*/ };
