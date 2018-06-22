@@ -33,7 +33,7 @@
         "transform": {
             ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
         },
-        "testRegex": "(/tests/.*)\\.(ts|tsx|js)$",
+        "testRegex": "/tests/.*.test.(js|ts|tsx)?$",
         "moduleFileExtensions": [
             "ts",
             "tsx",
