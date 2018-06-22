@@ -72,5 +72,5 @@ export { timerange, TimeRange };
 export { timeSeries, indexedSeries, timeRangeSeries, TimeSeries };
 export { Trigger, WindowingOptions };
 export { util };
-export { daily, DayWindow, window, Window } from "./window";
+export { daily, weekly, DayWindow, window, Window } from "./window";
 export { windowed, WindowedCollection } from "./windowedcollection";
