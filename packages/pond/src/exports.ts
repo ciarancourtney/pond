@@ -31,7 +31,7 @@ import { stream } from "./stream";
 import { time, Time } from "./time";
 import { timerange, TimeRange } from "./timerange";
 import { indexedSeries, timeRangeSeries, timeSeries, TimeSeries } from "./timeseries";
-import { Trigger, WindowingOptions } from "./types";
+import { ReducerFunction, Trigger, WindowingOptions } from "./types";
 import util from "./util";
 import { windowed, WindowedCollection } from "./windowedcollection";
 
@@ -70,7 +70,7 @@ export { stream };
 export { time, Time };
 export { timerange, TimeRange };
 export { timeSeries, indexedSeries, timeRangeSeries, TimeSeries };
-export { Trigger, WindowingOptions };
+export { ReducerFunction, Trigger, WindowingOptions };
 export { util };
 export { daily, weekly, monthly, DayWindow, window, Window } from "./window";
 export { windowed, WindowedCollection } from "./windowedcollection";
